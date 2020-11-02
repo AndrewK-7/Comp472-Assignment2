@@ -1,31 +1,103 @@
+import os
+import glob
+import time
 
-from Game import Game
-from Astar import Astar
-
-
-def main():
-    print("a")
+from x_puzzle_solver import XPuzzleSolver
 
 
-    for key, element in enumerate(loader("input.txt")):
-        print(element)
-        game = Game(element)
+def start(puzzles):
+    """
+    Start processing the sample puzzles.
+    :param puzzles: The array of sample puzzles to solve.
+    :return: void
+    """
+    # Create a new X-Puzzle solver object
+    x_puzzle_solver = XPuzzleSolver(puzzles)
 
-       # greedy = greedy(game)
-       # greedy.search()
+    # Start the process
+    x_puzzle_solver.solve()
+# end: start
 
-       # uniform = uniform(game)
-       # uniform.search()
 
-        astar = Astar(game)
-        astar.search()
+def read_samples(input_filename):
+    """
+    Read in the sample initial states.
+    :param input_filename: The filename to use for reading-in the data.
+    :return: The array of samples.
+    """
+    # Define an array to store the initial puzzle states
+    initial_states = []
 
-def loader(input_file):
-    input_list = []
-    with open(input_file) as file:
-        for line in file:
-            input_list.append(line.strip('\n').split( " "))
-    return input_list
+    # Read the sample initial-states from the input file line-by-line and add
+    # each one into our array
+    file = open(input_filename, "r")
 
-if __name__ == "__main__":
-    main()
+    while True:
+        # Get the next line from the file
+        line = file.readline()
+
+        # If the line is empty, we are done reading
+        if not line:
+            break
+
+        # Write our sample initial-state to our array (strip out the newline character)
+        initial_states.append(line.strip())
+    # end: while
+
+    # Don't forget to close our file connection
+    file.close()
+
+    return initial_states
+# end: read_samples
+
+
+def clear_old_outputs():
+    """
+    Clear any old output files from any previous runs.
+    :return: void
+    """
+    files_to_remove = glob.glob("outputs/**/*.txt", recursive=True)
+
+    # Delete any output files from the SOLUTIONS output directory
+    for f in files_to_remove:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+    # end: for-loop
+# end: clear_old_outputs
+
+
+if __name__ == '__main__':
+    """
+    The starting point to the application.
+    Using the input_file defined below, solve the provided puzzles using the
+    various algorithms defined in the XPuzzleSolver class.
+    """
+    # Print a message indicating that the application has started
+    print("\nStarting X-Puzzle Solver Application")
+    print("====================================\n")
+
+    # Get the starting time of the application
+    start_time = time.time()
+
+    # Define where to read in the sample puzzles
+    # *** NOTE *** Change this to point to the desired file to execute
+    input_file = "inputs/sample_inputs.txt"
+
+    # Get the list of samples to use this run
+    sample_puzzles = read_samples(input_file)
+
+    # Clear any output files from a previous run
+    clear_old_outputs()
+
+    # Start processing our puzzles
+    start(sample_puzzles)
+
+    # Get the ending time of the application
+    end_time = time.time()
+
+    # Print the total execution time that the application took
+    execution_time = end_time - start_time
+    print("X-Puzzle Solver has finished... took %d seconds\n" % execution_time)
+# end: __main__
