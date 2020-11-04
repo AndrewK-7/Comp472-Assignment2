@@ -5,14 +5,15 @@ import time
 from x_puzzle_solver import XPuzzleSolver
 
 
-def start(puzzles):
+def start(puzzles, num_rows):
     """
     Start processing the sample puzzles.
     :param puzzles: The array of sample puzzles to solve.
+    :param num_rows: The number of rows that each puzzle will have.
     :return: void
     """
     # Create a new X-Puzzle solver object
-    x_puzzle_solver = XPuzzleSolver(puzzles)
+    x_puzzle_solver = XPuzzleSolver(puzzles, num_rows)
 
     # Start the process
     x_puzzle_solver.solve()
@@ -85,6 +86,10 @@ if __name__ == '__main__':
     # *** NOTE *** Change this to point to the desired file to execute
     input_file = "inputs/sample_inputs.txt"
 
+    # Define how many rows are supposed to be in each of the puzzles
+    # *** NOTE *** Change this to the desired number of rows as needed
+    number_of_rows = 2
+
     # Get the list of samples to use this run
     sample_puzzles = read_samples(input_file)
 
@@ -92,7 +97,7 @@ if __name__ == '__main__':
     clear_old_outputs()
 
     # Start processing our puzzles
-    start(sample_puzzles)
+    start(sample_puzzles, number_of_rows)
 
     # Get the ending time of the application
     end_time = time.time()
