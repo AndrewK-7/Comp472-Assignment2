@@ -56,31 +56,31 @@ class XPuzzleSolver:
 
             # Create one instance of every search algorithm to be used on the puzzle
             ucs_algo = UniformCost(puzzle_number, puzzle, self.number_of_rows, self.algorithm_timeout)
-            gbfs_h1_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 1, self.number_of_rows, self.algorithm_timeout)
-            gbfs_h2_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 2, self.number_of_rows, self.algorithm_timeout)
-            astar_h1_algo = AStar(puzzle_number, puzzle, 1, self.number_of_rows, self.algorithm_timeout)
-            astar_h2_algo = AStar(puzzle_number, puzzle, 2, self.number_of_rows, self.algorithm_timeout)
+            #gbfs_h1_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 1, self.number_of_rows, self.algorithm_timeout)
+            #gbfs_h2_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 2, self.number_of_rows, self.algorithm_timeout)
+            #astar_h1_algo = AStar(puzzle_number, puzzle, 1, self.number_of_rows, self.algorithm_timeout)
+            #astar_h2_algo = AStar(puzzle_number, puzzle, 2, self.number_of_rows, self.algorithm_timeout)
 
             # Create the thread definition for each of the search algorithms
             usc_thread = Thread(target=ucs_algo.solve)
-            gbfs_h1_thread = Thread(target=gbfs_h1_algo.solve)
-            gbfs_h2_thread = Thread(target=gbfs_h2_algo.solve)
-            astar_h1_thread = Thread(target=astar_h1_algo.solve)
-            astar_h2_thread = Thread(target=astar_h2_algo.solve)
+            #gbfs_h1_thread = Thread(target=gbfs_h1_algo.solve)
+            #gbfs_h2_thread = Thread(target=gbfs_h2_algo.solve)
+            #astar_h1_thread = Thread(target=astar_h1_algo.solve)
+            #astar_h2_thread = Thread(target=astar_h2_algo.solve)
 
             # Add the thread to the list so we can join them all back later
             threads.append(usc_thread)
-            threads.append(gbfs_h1_thread)
-            threads.append(gbfs_h2_thread)
-            threads.append(astar_h1_thread)
-            threads.append(astar_h2_thread)
+            #threads.append(gbfs_h1_thread)
+            #threads.append(gbfs_h2_thread)
+            #threads.append(astar_h1_thread)
+            #threads.append(astar_h2_thread)
 
             # Start the execution of each of the threads
             usc_thread.start()
-            gbfs_h1_thread.start()
-            gbfs_h2_thread.start()
-            astar_h1_thread.start()
-            astar_h2_thread.start()
+            #gbfs_h1_thread.start()
+            #gbfs_h2_thread.start()
+            #astar_h1_thread.start()
+            #astar_h2_thread.start()
 
             # Loop through each of the execution threads and join them back
             for thread in threads:

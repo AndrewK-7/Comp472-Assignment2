@@ -14,8 +14,8 @@ class OutputWriter:
         :param heuristic: The heuristic function being used (i.e. 0, 1, 2).
         """
         # Set the path to the output file using the algorithm and heuristic
-        self.solution_output = "outputs/solutions/_" + repr(puzzle_num) + "_" + algorithm
-        self.search_output = "outputs/search/_" + repr(puzzle_num) + "_" + algorithm
+        self.solution_output = "outputs/solutions/" + repr(puzzle_num) + "_" + algorithm
+        self.search_output = "outputs/search/" + repr(puzzle_num) + "_" + algorithm
 
         # If the heuristic is non-zero, then we should add that to the output file path
         if heuristic != '0':
@@ -35,7 +35,7 @@ class OutputWriter:
         """
         # Create the file connection, append the line, and close the file connection
         f = open(self.solution_output, "a")
-        f.write(line_to_write)
+        f.write(line_to_write + "\n")
         f.close()
     # end: writeLineToSolution
 
@@ -47,7 +47,7 @@ class OutputWriter:
         """
         # Create the file connection, append the line, and close the file connection
         f = open(self.search_output, "a")
-        f.write(line_to_write)
+        f.write(line_to_write + "\n")
         f.close()
     # end: writeLineToSolution
 
