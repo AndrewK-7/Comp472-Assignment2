@@ -14,11 +14,12 @@ class XPuzzleSolver:
     The output of each algorithm will be written within the 'outputs' directory.
     """
 
-    def __init__(self, puzzles_as_strings, number_of_rows_per_puzzle):
+    def __init__(self, puzzles_as_strings, number_of_rows_per_puzzle, algorithm_timeout):
         """
         Initialize the xPuzzleSolver class with the list of initial-states to try and solve.
         :param puzzles_as_strings: The list of puzzles to solve (array of strings representing the initial-states).
         :param number_of_rows_per_puzzle: The number of rows for every puzzle.
+        :param algorithm_timeout: The max number of seconds that each algorithm has until it must be timed out.
         """
         # We should convert the array of strings of the initial-states into arrays to be used in our algorithms
         puzzles_as_arrays = []
@@ -30,6 +31,7 @@ class XPuzzleSolver:
         # Set the local variables
         self.puzzles = puzzles_as_arrays
         self.number_of_rows = number_of_rows_per_puzzle
+        self.algorithm_timeout = algorithm_timeout
     # end: __init__
 
     def solve(self):
@@ -53,11 +55,11 @@ class XPuzzleSolver:
             threads.clear()
 
             # Create one instance of every search algorithm to be used on the puzzle
-            ucs_algo = UniformCost(puzzle_number, puzzle, self.number_of_rows)
-            gbfs_h1_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 1, self.number_of_rows)
-            gbfs_h2_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 2, self.number_of_rows)
-            astar_h1_algo = AStar(puzzle_number, puzzle, 1, self.number_of_rows)
-            astar_h2_algo = AStar(puzzle_number, puzzle, 2, self.number_of_rows)
+            ucs_algo = UniformCost(puzzle_number, puzzle, self.number_of_rows, self.algorithm_timeout)
+            gbfs_h1_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 1, self.number_of_rows, self.algorithm_timeout)
+            gbfs_h2_algo = GreedyBestFirstSearch(puzzle_number, puzzle, 2, self.number_of_rows, self.algorithm_timeout)
+            astar_h1_algo = AStar(puzzle_number, puzzle, 1, self.number_of_rows, self.algorithm_timeout)
+            astar_h2_algo = AStar(puzzle_number, puzzle, 2, self.number_of_rows, self.algorithm_timeout)
 
             # Create the thread definition for each of the search algorithms
             usc_thread = Thread(target=ucs_algo.solve)

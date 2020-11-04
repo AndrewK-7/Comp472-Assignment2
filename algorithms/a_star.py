@@ -7,17 +7,21 @@ class AStar:
     This class is responsible for executing the "A*" search algorithm on the provided puzzle instance.
     """
 
-    def __init__(self, puzzle_num, puzzle, heuristic_number, number_of_rows_per_puzzle):
+    def __init__(self, puzzle_num, puzzle, heuristic_number, number_of_rows_per_puzzle, timeout):
         """
         Initialize this search algorithm object.
         :param puzzle_num: The puzzle number this is currently solving.
         :param puzzle: The initial-state of the puzzle.
         :param heuristic_number: The heuristic function to use (i.e. 1, or 2).
         :param number_of_rows_per_puzzle: The number of rows that each puzzle will contain.
+        :param timeout: The max number of seconds this algorithm has until it must be timed out.
         """
         # Set the puzzle's initial state
         self.puzzle = puzzle
         self.heuristic = heuristic_number
+
+        # Set the timeout time (in seconds)
+        self.timeout = timeout
 
         # Set the helper class for use in solving the search
         self.helper = Helper(len(puzzle), number_of_rows_per_puzzle)
@@ -35,6 +39,6 @@ class AStar:
 
         # Execute algorithm here...
 
-        print("   astar-h%d is done!" % self.heuristic, flush=True, end="\n")
+        print("   Done astar-h%d!" % self.heuristic, flush=True, end="\n")
     # end: solve
 # end: class AStar

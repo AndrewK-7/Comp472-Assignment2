@@ -1,6 +1,7 @@
 class Helper:
     """
     Class contains some common helper functions that the search algorithms will need to use.
+    Such helper functions include the different movement functions as well as the 'is_goal_state' function.
     """
 
     def __init__(self, size_of_puzzle, number_of_rows=2):
@@ -12,7 +13,6 @@ class Helper:
         self.puzzle_length = size_of_puzzle
         self.number_of_rows = number_of_rows
         self.puzzle_width = int(size_of_puzzle / number_of_rows)
-
     # end: __init__
 
     def is_goal_state(self, current_state):

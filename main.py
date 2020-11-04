@@ -5,15 +5,16 @@ import time
 from x_puzzle_solver import XPuzzleSolver
 
 
-def start(puzzles, num_rows):
+def start(puzzles, num_rows, timeout):
     """
     Start processing the sample puzzles.
     :param puzzles: The array of sample puzzles to solve.
     :param num_rows: The number of rows that each puzzle will have.
+    :param timeout: The max number of seconds that each algorithm has to execute before being timed out.
     :return: void
     """
     # Create a new X-Puzzle solver object
-    x_puzzle_solver = XPuzzleSolver(puzzles, num_rows)
+    x_puzzle_solver = XPuzzleSolver(puzzles, num_rows, timeout)
 
     # Start the process
     x_puzzle_solver.solve()
@@ -90,6 +91,10 @@ if __name__ == '__main__':
     # *** NOTE *** Change this to the desired number of rows as needed
     number_of_rows = 2
 
+    # Define how many seconds must pass before a search algorithm should be timed out
+    # *** NOTE *** Change this value to the desired number
+    algorithm_timeout = 60
+
     # Get the list of samples to use this run
     sample_puzzles = read_samples(input_file)
 
@@ -97,7 +102,7 @@ if __name__ == '__main__':
     clear_old_outputs()
 
     # Start processing our puzzles
-    start(sample_puzzles, number_of_rows)
+    start(sample_puzzles, number_of_rows, algorithm_timeout)
 
     # Get the ending time of the application
     end_time = time.time()
