@@ -8,6 +8,7 @@ def get_state_as_string(state):
     for element in state:
         string_state += " " + element
     return string_state.lstrip()
+# end: get_state_as_string
 
 
 class Helper:
@@ -428,7 +429,7 @@ class Helper:
         """
         Generate all of the possible children for the current state of the game.
         :param current_state: The current state of the game.
-        :return: A tuple containing:
+        :return: A list of tuples containing:
                    1. the modified state of that particular move,
                    2. the cost of the move,
                    3. the name of the move,
@@ -471,12 +472,14 @@ class Helper:
             # The diagonal adjacent:
             diagonal_adjacent_copy = current_state.copy()
             result = self.diagonal_adjacent(diagonal_adjacent_copy)
-            list_of_possible_moves.append((diagonal_adjacent_copy, self.cost_of_diagonal_adjacent, 'diagonal_adjacent', result[1]))
+            list_of_possible_moves.append(
+                (diagonal_adjacent_copy, self.cost_of_diagonal_adjacent, 'diagonal_adjacent', result[1]))
 
             # The diagonal across:
             diagonal_across_copy = current_state.copy()
             result = self.diagonal_across(diagonal_across_copy)
-            list_of_possible_moves.append((diagonal_across_copy, self.cost_of_diagonal_across, 'diagonal_across', result[1]))
+            list_of_possible_moves.append(
+                (diagonal_across_copy, self.cost_of_diagonal_across, 'diagonal_across', result[1]))
         # end: if
 
         # Return the list of possible moves
