@@ -294,8 +294,8 @@ class Helper:
 
     def wrap(self, current_state):
         """
-        A "wrapping move", which involves moving the '0' tile from one of the corner positions across to the opposite
-        corner position (not diagonally).
+        A "wrapping move", which involves moving the '0' tile from one of the corner positions across (horizontally)
+        to the opposite tile in the same row.
         :param current_state: The current configuration of the puzzle. NOTE: We are modifying the array by reference.
         :return: A tuple containing the cost of performing this move, and the tile that was swapped.
         """
@@ -336,6 +336,56 @@ class Helper:
 
         return self.cost_of_wrap_move, tile_that_was_swapped
     # end: wrap
+
+    def wrap_scale(self, current_state):
+        """
+        A "wrapping move", but when the game board is scaled up, which involves moving the '0' tile from one of the
+        corner positions across (vertically) to the opposite tile in the same column.
+        This is only applicable when the game board has more than two rows.
+        :param current_state: The current configuration of the puzzle. NOTE: We are modifying the array by reference.
+        :return: A tuple containing the cost of performing this move, and the tile that was swapped.
+        """
+        # Find the index of the '0' tile
+        index = current_state.index('0')
+        tile_that_was_swapped = '0'
+
+        # If the current state can't perform the 'wrap' action, then exit the function
+        if not self.can_move_wrap(index):
+            return 0, tile_that_was_swapped
+
+        # Check if the game board has more than 2 rows
+        elif self.number_of_rows <= 2:
+            return 0, tile_that_was_swapped
+
+        # Else, we can perform the swap
+        else:
+            # We need to find the opposite position of the '0' tile
+            index_to_swap = index
+
+            # If the '0' tile is in the top-left corner, then we need to switch it with the bottom-left corner
+            if index == 0:
+                index_to_swap = self.puzzle_length - self.puzzle_width
+
+            # If the '0' tile is in the top-right corner, then we need to switch it with the bottom-right corner
+            elif index == self.puzzle_width - 1:
+                index_to_swap = self.puzzle_length - 1
+
+            # If the tile is in the bottom-left corner, then we need to switch it with the top-left corner
+            elif index == self.puzzle_length - self.puzzle_width:
+                index_to_swap = 0
+
+            # If the tile is in the bottom-right corner, then we need to switch it with the top-right corner
+            elif index == self.puzzle_length - 1:
+                index_to_swap = self.puzzle_width - 1
+
+            # Swap the '0' tile with the other index
+            tile_that_was_swapped = current_state[index_to_swap]
+            current_state[index] = current_state[index_to_swap]
+            current_state[index_to_swap] = '0'
+        # end: if-else
+
+        return self.cost_of_wrap_move, tile_that_was_swapped
+    # end: wrap_scale
 
     def diagonal_adjacent(self, current_state):
         """
@@ -462,10 +512,20 @@ class Helper:
         if result[0] > 0:
             list_of_possible_moves.append((move_right_copy, self.cost_of_move_right, 'move_right', result[1]))
 
-        wrap_copy = current_state.copy()
-        result = self.wrap(wrap_copy)
-        if result[0] > 0:
-            list_of_possible_moves.append((wrap_copy, self.cost_of_wrap_move, 'wrap', result[1]))
+        # Two possible moves can be done if the wrap is allowed
+        if self.can_move_wrap(index):
+            # The regular (horizontal) wrap
+            regular_wrap_copy = current_state.copy()
+            result = self.wrap(regular_wrap_copy)
+            if result[0] > 0:
+                list_of_possible_moves.append((regular_wrap_copy, self.cost_of_wrap_move, 'wrap', result[1]))
+
+            # The scaled-up (vertical) wrap
+            scaled_wrap_copy = current_state.copy()
+            result = self.wrap_scale(scaled_wrap_copy)
+            if result[0] > 0:
+                list_of_possible_moves.append((scaled_wrap_copy, self.cost_of_wrap_move, 'wrap_scale', result[1]))
+        # end: if
 
         # Two possible moves can be done if the diagonal action is allowed
         if self.can_move_diagonally(index):
