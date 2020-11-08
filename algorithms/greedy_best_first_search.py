@@ -34,6 +34,8 @@ class GreedyBestFirstSearch:
 
         # Define the output writer for this algorithm
         self.output_writer = OutputWriter(puzzle_num, "gbfs", heuristic_number)
+        self.open_list = [Node(puzzle, None, 0, None, 0, None)]
+        self.closed_list = []
     # end: __init__
 
     def solve(self):
@@ -196,46 +198,20 @@ class GreedyBestFirstSearch:
             else:
                 child_node = Node(child[0], current_node, current_node.cost + self.helper.h0(child[0]), child[2], child[1], child[3])
             # Check if the child state already exists in the closed list
+
             found_in_closed_list = False
             for node in self.closed_list:
                 comparison = np.array(node.state) == np.array(child_node.state)
                 if comparison.all():
-                    # Check if the cost of the element already in the close-list is smaller
+                    found_in_closed_list = True
                     if node.cost > child_node.cost:
                         # In this case where child node is smaller, put it in the open list
                         self.open_list.append(child_node)
-                        found_in_closed_list = True
-                    else:
-                        #in this case where child node is bigger, still compare with the open list
-                        found_in_closed_list = False
-                    # end: if-elseokk
                     break
             # end: for-loop
 
-            # Check if the child state already exists in the open list with a smaller cost
-            # (we only need to check if we didn't already confirm the node was in the closed list)
-            found_in_open_list = False
-            if not found_in_closed_list:
-                for i in range(len(self.open_list)):
-                    node = self.open_list[i]
-                    comparison = np.array(node.state) == np.array(child_node.state)
-                    if comparison.all():
-                        # Check if the cost of the element already in the open-list is smaller
-                        if node.cost < child_node.cost:
-                            # In this case, we don't want to add this child node
-                            found_in_open_list = True
-                        else:
-                            # In this case, we want to replace the existing node with the same state with this new node
-                            self.open_list[i] = child_node
-                        # end: if-else
-
-                        break
-                    # end: if
-                # end: for-loop
-            # end: if
-
             # If the node is NOT in the closed list and was NOT in the open list, we can add it to our open list
-            if not found_in_closed_list and not found_in_open_list:
+            if not found_in_closed_list :
                 self.open_list.append(child_node)
         # end: for-loop
     # end: handle_children
@@ -271,3 +247,4 @@ class Node:
         self.moved_tile = moved_tile
     # end: __init__
 # end: class Node
+
