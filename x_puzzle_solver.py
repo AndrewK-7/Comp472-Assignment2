@@ -1,9 +1,7 @@
 from threading import Thread
 import time
-
-from algorithms.uniform import UniformCost
 from algorithms.greedy_best_first_search import GreedyBestFirstSearch
-from algorithms.a_star import AStar
+
 
 
 class XPuzzleSolver:
