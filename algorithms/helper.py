@@ -547,6 +547,10 @@ class Helper:
     # end: generate_children
 # end: class Helper
 
+    def h0(self, current_state):
+        if self.is_goal_state(current_state):
+            return 0
+        return 1
 
 
     def h1(self, current_state):
@@ -595,3 +599,6 @@ class Helper:
     # end: if
 
         return min(h0, h1)
+
+    # Manhattan Distance
+    def h3(self, current_state):

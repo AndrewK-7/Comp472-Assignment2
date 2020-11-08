@@ -194,8 +194,15 @@ class AStar:
         # Check each of the children to see if they must be added to the open list
         for child in child_states:
             # Create the child node object
-            child_node = Node(child[0], current_node, current_node.cost + child[1]+self.helper.h1(child[0]), child[2], child[1], child[3])
-
+            if self.heuristic == 1:
+                child_node = Node(child[0], current_node, current_node.cost + self.helper.h1(child[0]) + child[1], child[2],
+                                  child[1], child[3])
+            elif self.heuristic == 2:
+                child_node = Node(child[0], current_node, current_node.cost + self.helper.h2(child[0]) + child[1], child[2],
+                                  child[1], child[3])
+            else:
+                child_node = Node(child[0], current_node, current_node.cost + self.helper.h0(child[0]) + child[1] , child[2],
+                                  child[1], child[3])
             # Check if the child state already exists in the closed list
             found_in_closed_list = False
             for node in self.closed_list:
