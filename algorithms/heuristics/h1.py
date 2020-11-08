@@ -1,6 +1,6 @@
 
 
-def h0(self, current_state):
+def h1(self, current_state):
     """
     Check h0
     if value of each index is different from goal state, add1.

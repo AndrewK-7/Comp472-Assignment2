@@ -194,7 +194,7 @@ class AStar:
         # Check each of the children to see if they must be added to the open list
         for child in child_states:
             # Create the child node object
-            child_node = Node(child[0], current_node, current_node.cost + child[1]+self.helper.h0(child[0]), child[2], child[1], child[3])
+            child_node = Node(child[0], current_node, current_node.cost + child[1]+self.helper.h1(child[0]), child[2], child[1], child[3])
 
             # Check if the child state already exists in the closed list
             found_in_closed_list = False
@@ -206,11 +206,10 @@ class AStar:
                         # In this case where child node is smaller, put it in the open list
                         self.open_list.append(child_node)
                         found_in_closed_list = True
-                        print(child_note.state)
                     else:
                         #in this case where child node is bigger, still compare with the open list
                         found_in_closed_list = False
-                    # end: if-else
+                    # end: if-elseokk
                     break
             # end: for-loop
 
