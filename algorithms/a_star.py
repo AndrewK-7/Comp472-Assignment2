@@ -37,11 +37,6 @@ class AStar:
         self.closed_list = []
     # end: __init__
 
-
-    #def hdraft(state):
-    #    return sum(abs(b % 4 - g % 4) + abs(b // 4 - g // 4)
-    #               for b, g in ((state.index(i), goal_state.index(i)) for i in range(1, 9)))
-
     def solve(self):
         """
         Solve the puzzle using the A* search algorithm.
@@ -194,16 +189,17 @@ class AStar:
         # Check each of the children to see if they must be added to the open list
         for child in child_states:
             # Create the child node object
-            if self.heuristic == 1:
-                child_node = Node(child[0], current_node, current_node.cost + self.helper.h1(child[0]) + child[1], child[2],
-                                  child[1], child[3])
-            elif self.heuristic == 2:
-                child_node = Node(child[0], current_node, current_node.cost + self.helper.h2(child[0]) + child[1], child[2],
-                                  child[1], child[3])
-            else:
-                child_node = Node(child[0], current_node, current_node.cost + self.helper.h0(child[0]) + child[1] , child[2],
-                                  child[1], child[3])
+            #if self.heuristic == 1:
+            #    child_node = Node(child[0], current_node, current_node.cost + self.helper.h1(child[0]) + child[1], child[2],
+            #                      child[1], child[3])
+            #elif self.heuristic == 2:
+            #    child_node = Node(child[0], current_node, current_node.cost + self.helper.h2(child[0]) + child[1], child[2],
+            #                      child[1], child[3])
+            #else:
+            #    child_node = Node(child[0], current_node, current_node.cost + self.helper.h0(child[0]) + child[1], child[2],
+            #                      child[1], child[3])
             # Check if the child state already exists in the closed list
+
             found_in_closed_list = False
             for node in self.closed_list:
                 comparison = np.array(node.state) == np.array(child_node.state)
