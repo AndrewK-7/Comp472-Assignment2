@@ -192,11 +192,11 @@ class GreedyBestFirstSearch:
         for child in child_states:
             # Create the child node object
             if self.heuristic == 1:
-                child_node = Node(child[0], current_node, current_node.cost + self.helper.h1(child[0]), child[2], child[1], child[3])
+                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h1(child[0]), child[2], child[1], child[3])
             elif self.heuristic == 2:
-                child_node = Node(child[0], current_node, current_node.cost + self.helper.h2(child[0]), child[2], child[1], child[3])
+                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h2(child[0]), child[2], child[1], child[3])
             else:
-                child_node = Node(child[0], current_node, current_node.cost + self.helper.h0(child[0]), child[2], child[1], child[3])
+                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h0(child[0]), child[2], child[1], child[3])
             # Check if the child state already exists in the closed list
 
             found_in_closed_list = False
