@@ -602,10 +602,10 @@ class Helper:
 
     # Manhattan Distance
     def h2(self, current_state):
-        goal1 = [1, 2, 3, 4, 5, 6, 7, 0]
-        goal2 = [1, 3, 5, 7, 2, 4, 6, 0]
+        goal1 = ['1', '2', '3', '4', '5', '6', '7', '0']
+        goal2 = ['1', '3', '5', '7', '2', '4', '6', '0']
         return min(sum(abs(b % 4 - g % 4) + abs(b // 4 - g // 4) for b, g in
-                       ((current_state.index(i), goal2.index(i)) for i in range(8))),
+                       ((current_state.index(str(i)), goal2.index(str(i))) for i in range(8))),
                    sum(abs(b % 4 - g % 4) + abs(b // 4 - g // 4) for b, g in
-                       ((current_state.index(i), goal1.index(i)) for i in range(8)))
+                       ((current_state.index(str(i)), goal1.index(str(i))) for i in range(8)))
                    )
