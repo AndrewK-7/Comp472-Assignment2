@@ -111,9 +111,10 @@ class AStar:
         """
         # The line should contain the f(n), g(n), and h(n) followed by the state of the node
         # For uniform cost search, there is no h(n) or f(n) so we will put 0
-        h = 0
-        f = 0
+        h = self.helper.h1(node.state)
         g = node.cost
+        f = h+g
+
 
         # Write the line to the file
         self.output_writer.write_line_to_search(
@@ -200,18 +201,24 @@ class AStar:
                                   child[1], child[3])
             # Check if the child state already exists in the closed list
 
+            # Check if the child state already exists in the closed list
             found_in_closed_list = False
-            for node in self.closed_list:
+            for i in range(len(self.closed_list)):
+                node = self.closed_list[i]
                 comparison = np.array(node.state) == np.array(child_node.state)
                 if comparison.all():
                     found_in_closed_list = True
-                    if node.cost > child_node.cost:
-                        # In this case where child node is smaller, put it in the open list
-                        self.open_list.append(child_node)
+                    # Check if the cost of the element already in the open-list is smaller
+                    if node.cost < child_node.cost:
+                        # In this case, we don't want to add this child node
+                        found_in_closed_list = True
+                    else:
+                        # In this case, we want to replace the existing node with the same state with this new node
+                        self.closed_list[i] = child_node
+                    # end: if-else
+
                     break
-            # end: for-loop
-
-
+                # end: if
 
             # Check if the child state already exists in the open list with a smaller cost
             # (we only need to check if we didn't already confirm the node was in the closed list)
@@ -238,6 +245,7 @@ class AStar:
             # If the node is NOT in the closed list and was NOT in the open list, we can add it to our open list
             if not found_in_closed_list and not found_in_open_list:
                 self.open_list.append(child_node)
+
         # end: for-loop
     # end: handle_children
 # end: class UniformCost
