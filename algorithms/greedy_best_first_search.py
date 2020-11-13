@@ -2,10 +2,10 @@ import time
 import numpy as np
 
 from output_writer import OutputWriter
+from algorithms.node import Node
 from algorithms.helper import Helper
 from algorithms.helper import get_state_as_string
-from heapq import heappush, heappop, heapify
-import itertools
+
 
 class GreedyBestFirstSearch:
     """
@@ -45,7 +45,6 @@ class GreedyBestFirstSearch:
         """
         print("   Starting gbfs-h%d..." % self.heuristic, flush=True, end="\n")
 
-        # Execute algorithm here...
         # We want to continue to loop until we have reached one of the following conditions:
         #   1. There are no more nodes in the open list (no solution found)
         #   2. We have reached the goal state (solution found)
@@ -89,21 +88,26 @@ class GreedyBestFirstSearch:
         # end: while-loop
 
         # Did we find a goal state?
+        timedout = False
         if found_goal:
             self.write_solution(goal_node, execution_time)
         else:
             # If the solution could not be found due to a timeout
             if execution_time >= self.timeout:
                 self.output_writer.write_line_to_solution("no solution (timed out)")
+                timedout = True
             else:
                 self.output_writer.write_line_to_solution("no solution")
             # end: if-else
         # end: if-else
 
-        print("   Done gbfs-h%d!" % self.heuristic, flush=True, end="\n")
-    # end: solve
-# end: class GreedyBestFirstSearch
+        line = "   Done"
+        if timedout:
+            line = "   Timed-out"
 
+        line += " gbfs-h%d!  (took " + "{:.4f}".format(execution_time) + " seconds)"
+        print(line % self.heuristic, flush=True, end="\n")
+    # end: solve
 
     def write_search(self, node):
         """
@@ -112,15 +116,14 @@ class GreedyBestFirstSearch:
         :return: void
         """
         # The line should contain the f(n), g(n), and h(n) followed by the state of the node
-        # For uniform cost search, there is no h(n) or f(n) so we will put 0
-        h = 0
-        f = 0
+        # For GBFS, there is no f(n) so we will put 0
+        h = node.heuristic_value
         g = node.cost
+        f = 0
 
         # Write the line to the file
         self.output_writer.write_line_to_search(
-            repr(f) + " " + repr(g) + " " + repr(h) + " " +
-            get_state_as_string(node.state)
+            repr(f) + " " + repr(g) + " " + repr(h) + " " + get_state_as_string(node.state)
         )
     # end: write_search
 
@@ -173,10 +176,10 @@ class GreedyBestFirstSearch:
 
     def sort_open_list(self):
         """
-        Sort the open list by the cost of each of the nodes.
+        Sort the open list by the h(n) of each of the nodes.
         :return: void
         """
-        self.open_list.sort(key=lambda node: node.cost)
+        self.open_list.sort(key=lambda node: node.heuristic_value)
     # end: sort_open_list
 
     def handle_children(self, current_node, child_states):
@@ -187,64 +190,42 @@ class GreedyBestFirstSearch:
         :param child_states: The list of children of the the current node.
         :return: void
         """
-
         # Check each of the children to see if they must be added to the open list
         for child in child_states:
-            # Create the child node object
+            # Create the child node objects for each of the heuristics
+            # GBFS does not use the f(n) or g(n) values
+            # The first heuristic
+            cost = current_node.cost + child[1]
             if self.heuristic == 1:
-                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h1(child[0]), child[2], child[1], child[3])
-            elif self.heuristic == 2:
-                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h2(child[0]), child[2], child[1], child[3])
-            else:
-                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h0(child[0]), child[2], child[1], child[3])
-            # Check if the child state already exists in the closed list
+                h_1 = self.helper.h1(child[0])
+                child_node = Node(child[0], current_node, cost, child[2], child[1], child[3], h_1, 0)
 
+            # The second heuristic
+            elif self.heuristic == 2:
+                h_2 = self.helper.h2(child[0])
+                child_node = Node(child[0], current_node, cost, child[2], child[1], child[3], h_2, 0)
+
+            # The "default" heuristic
+            else:
+                h_0 = self.helper.h0(child[0])
+                child_node = Node(child[0], current_node, cost, child[2], child[1], child[3], h_0, 0)
+            # end: if-else
+
+            # Check if the child state already exists in the closed list
             found_in_closed_list = False
             for node in self.closed_list:
                 comparison = np.array(node.state) == np.array(child_node.state)
                 if comparison.all():
                     found_in_closed_list = True
-                    if node.cost > child_node.cost:
+                    if node.heuristic_value > child_node.heuristic_value:
                         # In this case where child node is smaller, put it in the open list
                         self.open_list.append(child_node)
                     break
             # end: for-loop
 
             # If the node is NOT in the closed list and was NOT in the open list, we can add it to our open list
-            if not found_in_closed_list :
+            if not found_in_closed_list:
                 self.open_list.append(child_node)
         # end: for-loop
     # end: handle_children
-# end: class UniformCost
-
-
-class Node:
-    """
-    A small class to house the common properties related to a node in our state tree.
-    """
-
-    def __init__(self,
-                 node_state,
-                 parent_node,
-                 total_cost_from_root,
-                 move_to_get_here_from_parent,
-                 move_cost,
-                 moved_tile):
-        """
-        Define the node object.
-        :param node_state: The state that this node contains.
-        :param parent_node: The state of the parent node.
-        :param total_cost_from_root: The total cost to get to this node from the root.
-        :param move_to_get_here_from_parent: The type of move that was taken to reach this node.
-        :param move_cost: The cost of the move.
-        :param moved_tile: The tile that was moved to get to this state.
-        """
-        self.state = node_state
-        self.parent_node = parent_node
-        self.cost = total_cost_from_root
-        self.move = move_to_get_here_from_parent
-        self.move_cost = move_cost
-        self.moved_tile = moved_tile
-    # end: __init__
-# end: class Node
-
+# end: class GreedyBestFirstSearch

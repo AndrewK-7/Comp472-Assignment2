@@ -2,10 +2,10 @@ import time
 import numpy as np
 
 from output_writer import OutputWriter
+from algorithms.node import Node
 from algorithms.helper import Helper
 from algorithms.helper import get_state_as_string
-from heapq import heappush, heappop, heapify
-import itertools
+
 
 class AStar:
     """
@@ -44,7 +44,6 @@ class AStar:
         """
         print("   Starting astar-h%d..." % self.heuristic, flush=True, end="\n")
 
-        # Execute algorithm here...
         # We want to continue to loop until we have reached one of the following conditions:
         #   1. There are no more nodes in the open list (no solution found)
         #   2. We have reached the goal state (solution found)
@@ -88,20 +87,26 @@ class AStar:
         # end: while-loop
 
         # Did we find a goal state?
+        timedout = False
         if found_goal:
             self.write_solution(goal_node, execution_time)
         else:
             # If the solution could not be found due to a timeout
             if execution_time >= self.timeout:
                 self.output_writer.write_line_to_solution("no solution (timed out)")
+                timedout = True
             else:
                 self.output_writer.write_line_to_solution("no solution")
             # end: if-else
         # end: if-else
 
-        print("   Done astar-h%d!" % self.heuristic, flush=True, end="\n")
+        line = "   Done"
+        if timedout:
+            line = "   Timed-out"
+
+        line += " astar-h%d! (took " + "{:.4f}".format(execution_time) + " seconds)"
+        print(line % self.heuristic, flush=True, end="\n")
     # end: solve
-# end: class AStar
 
     def write_search(self, node):
         """
@@ -110,16 +115,13 @@ class AStar:
         :return: void
         """
         # The line should contain the f(n), g(n), and h(n) followed by the state of the node
-        # For uniform cost search, there is no h(n) or f(n) so we will put 0
-        h = self.helper.h1(node.state)
+        h = node.heuristic_value
         g = node.cost
-        f = h+g
-
+        f = node.f_value
 
         # Write the line to the file
         self.output_writer.write_line_to_search(
-            repr(f) + " " + repr(g) + " " + repr(h) + " " +
-            get_state_as_string(node.state)
+            repr(f) + " " + repr(g) + " " + repr(h) + " " + get_state_as_string(node.state)
         )
     # end: write_search
 
@@ -172,10 +174,10 @@ class AStar:
 
     def sort_open_list(self):
         """
-        Sort the open list by the cost of each of the nodes.
+        Sort the open list by the f(n) of each of the nodes.
         :return: void
         """
-        self.open_list.sort(key=lambda node: node.cost)
+        self.open_list.sort(key=lambda node: node.f_value)
     # end: sort_open_list
 
     def handle_children(self, current_node, child_states):
@@ -186,39 +188,56 @@ class AStar:
         :param child_states: The list of children of the the current node.
         :return: void
         """
-
         # Check each of the children to see if they must be added to the open list
         for child in child_states:
-            # Create the child node object
+            # Create the child node objects for each of the heuristics
+            # To calculate the f(n) for each of the heuristics, we must sum the g(n) of the current (parent) node with
+            # the cost it takes to get to the child from the current node. Then we add the heuristic h(n) to that to get
+            # the final f(n) to be used for that child node
+
+            # The first heuristic
+            cost = current_node.cost + child[1]
             if self.heuristic == 1:
-                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h1(child[0]) + child[1], child[2],
-                                  child[1], child[3])
+                h_1 = self.helper.h1(child[0])
+                f_1 = cost + h_1
+                child_node = Node(child[0], current_node, cost, child[2], child[1], child[3], h_1, f_1)
+
+            # The second heuristic
             elif self.heuristic == 2:
-                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h2(child[0]) + child[1], child[2],
-                                  child[1], child[3])
+                h_2 = self.helper.h2(child[0])
+                f_2 = cost + h_2
+                child_node = Node(child[0], current_node, cost, child[2], child[1], child[3], h_2, f_2)
+
+            # The "default" heuristic
             else:
-                child_node = Node(child[0], current_node, current_node.cost//10 + self.helper.h0(child[0]) + child[1], child[2],
-                                  child[1], child[3])
-            # Check if the child state already exists in the closed list
+                h_0 = self.helper.h0(child[0])
+                f_0 = cost + h_0
+                child_node = Node(child[0], current_node, cost, child[2], child[1], child[3], h_0, f_0)
+            # end: if-else
 
             # Check if the child state already exists in the closed list
             found_in_closed_list = False
+            index_to_pop = -1
             for i in range(len(self.closed_list)):
                 node = self.closed_list[i]
                 comparison = np.array(node.state) == np.array(child_node.state)
                 if comparison.all():
-                    found_in_closed_list = True
-                    # Check if the cost of the element already in the open-list is smaller
-                    if node.cost < child_node.cost:
-                        # In this case, we don't want to add this child node
-                        found_in_closed_list = True
+                    # If we found a new child node that was already in the closed list, but with a lower cost
+                    # then we should remove the node from the closed list and add the new child node to the open list
+                    if node.f_value > child_node.f_value:
+                        index_to_pop = i
+
+                    # Else, if the element in the closed list has a smaller or equal value, then we don't want to
+                    # add this child node to the open list
                     else:
-                        # In this case, we want to replace the existing node with the same state with this new node
-                        self.closed_list[i] = child_node
-                    # end: if-else
+                        found_in_closed_list = True
 
                     break
-                # end: if
+            # end: for-loop
+
+            # Check if we need to pop the element from the closed list
+            if index_to_pop != -1:
+                self.closed_list.pop(index_to_pop)
 
             # Check if the child state already exists in the open list with a smaller cost
             # (we only need to check if we didn't already confirm the node was in the closed list)
@@ -228,8 +247,8 @@ class AStar:
                     node = self.open_list[i]
                     comparison = np.array(node.state) == np.array(child_node.state)
                     if comparison.all():
-                        # Check if the cost of the element already in the open-list is smaller
-                        if node.cost < child_node.cost:
+                        # Check if the f(n) of the element already in the open-list is smaller
+                        if node.f_value < child_node.f_value:
                             # In this case, we don't want to add this child node
                             found_in_open_list = True
                         else:
@@ -245,38 +264,6 @@ class AStar:
             # If the node is NOT in the closed list and was NOT in the open list, we can add it to our open list
             if not found_in_closed_list and not found_in_open_list:
                 self.open_list.append(child_node)
-
         # end: for-loop
     # end: handle_children
-# end: class UniformCost
-
-
-class Node:
-    """
-    A small class to house the common properties related to a node in our state tree.
-    """
-
-    def __init__(self,
-                 node_state,
-                 parent_node,
-                 total_cost_from_root,
-                 move_to_get_here_from_parent,
-                 move_cost,
-                 moved_tile):
-        """
-        Define the node object.
-        :param node_state: The state that this node contains.
-        :param parent_node: The state of the parent node.
-        :param total_cost_from_root: The total cost to get to this node from the root.
-        :param move_to_get_here_from_parent: The type of move that was taken to reach this node.
-        :param move_cost: The cost of the move.
-        :param moved_tile: The tile that was moved to get to this state.
-        """
-        self.state = node_state
-        self.parent_node = parent_node
-        self.cost = total_cost_from_root
-        self.move = move_to_get_here_from_parent
-        self.move_cost = move_cost
-        self.moved_tile = moved_tile
-    # end: __init__
-# end: class Node
+# end: class AStar

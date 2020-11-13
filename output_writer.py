@@ -50,5 +50,4 @@ class OutputWriter:
         f.write(line_to_write + "\n")
         f.close()
     # end: writeLineToSolution
-
 # end: class OutputWriter

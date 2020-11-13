@@ -8,6 +8,8 @@ def get_state_as_string(state):
     for element in state:
         string_state += " " + element
     return string_state.lstrip()
+
+
 # end: get_state_as_string
 
 
@@ -45,6 +47,7 @@ class Helper:
         # These are all of the 'diagonal' moves
         self.cost_of_diagonal_adjacent = diagonal_move_cost
         self.cost_of_diagonal_across = diagonal_move_cost
+
     # end: __init__
 
     def is_goal_state(self, current_state):
@@ -88,6 +91,7 @@ class Helper:
         # end: if
 
         return is_goal
+
     # end: is_goal_state
 
     def can_move_up(self, index):
@@ -100,6 +104,7 @@ class Helper:
         if index in range(0, self.puzzle_width):
             return False
         return True
+
     # end: can_move_up
 
     def can_move_down(self, index):
@@ -112,6 +117,7 @@ class Helper:
         if index in range(self.puzzle_length - self.puzzle_width, self.puzzle_length):
             return False
         return True
+
     # end: can_move_down
 
     def can_move_left(self, index):
@@ -128,6 +134,7 @@ class Helper:
             return False
 
         return True
+
     # end: can_move_left
 
     def can_move_right(self, index):
@@ -144,6 +151,7 @@ class Helper:
             return False
 
         return True
+
     # end: can_move_right
 
     def can_move_wrap(self, index):
@@ -160,6 +168,7 @@ class Helper:
             return False
 
         return True
+
     # end: can_move_wrap
 
     def can_move_diagonally(self, index):
@@ -176,6 +185,7 @@ class Helper:
             return False
 
         return True
+
     # end: can_move_diagonally
 
     def move_up(self, current_state):
@@ -205,6 +215,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_up, tile_that_was_swapped
+
     # end: move_up
 
     def move_down(self, current_state):
@@ -234,6 +245,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_down, tile_that_was_swapped
+
     # end: move_down
 
     def move_left(self, current_state):
@@ -262,6 +274,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_left, tile_that_was_swapped
+
     # end: move_left
 
     def move_right(self, current_state):
@@ -290,6 +303,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_right, tile_that_was_swapped
+
     # end: move_right
 
     def wrap(self, current_state):
@@ -335,6 +349,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_wrap_move, tile_that_was_swapped
+
     # end: wrap
 
     def wrap_scale(self, current_state):
@@ -385,6 +400,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_wrap_move, tile_that_was_swapped
+
     # end: wrap_scale
 
     def diagonal_adjacent(self, current_state):
@@ -429,6 +445,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_diagonal_adjacent, tile_that_was_swapped
+
     # end: diagonal_adjacent
 
     def diagonal_across(self, current_state):
@@ -473,6 +490,7 @@ class Helper:
         # end: if-else
 
         return self.cost_of_diagonal_across, tile_that_was_swapped
+
     # end: diagonal_across
 
     def generate_children(self, current_state):
@@ -544,68 +562,98 @@ class Helper:
 
         # Return the list of possible moves
         return list_of_possible_moves
+
     # end: generate_children
-# end: class Helper
 
     def h0(self, current_state):
-        if self.is_goal_state(current_state):
+        """
+        The "default" heuristic, defined by the assignment specifications.
+        If the '0' tile is in the last index, return 0, otherwise return 1, for all states.
+        :param current_state: The current state of the puzzle.
+        :return: The heuristic value.
+        """
+        index = current_state.index('0')
+        if index == self.puzzle_length - 1:
             return 0
+
         return 1
 
+    # end: h0
 
     def h1(self, current_state):
         """
-        Check h0
-        if value of each index is different from goal state, add1.
-        return minimum between h0 and h1 which is from two different goal.
+        The first heuristic.
+        This heuristic implements the "Hamming Distance" calculation.
         :param current_state: The current state of the puzzle.
-        :return: h0 value
+        :return: The heuristic value.
         """
-    # Default the variable to be true
+        # Default the variable to be true
         is_goal = True
 
-        h0 = 0
-        h1 = 0
+        # Define the two heuristics for each goal state
+        h_goal_1 = 0
+        h_goal_2 = 0
 
-    # Check if the current state equals goal state 1
+        # Check if the current state equals goal state 1
         for i in range(1, self.puzzle_length):
             if int(current_state[i - 1]) != i:
-                h0 += 1
+                h_goal_1 += 1
                 is_goal = False
+        # end: for-loop
 
-    # end: for-loop
-
-    # Only check if the current state equals goal state 2
-    # if we didn't already determine it was goal state 1
+        # Only check for the second goal state if the current state does not equal the goal
+        # and if we didn't already determine it was goal state 1
         if not is_goal:
-            is_goal = True  # Reset the value
+            # Reset the value
+            is_goal = True
             counter = 1
-        # Check if the current state equals goal state 2
+
+            # Check if the current state equals goal state 2
             for j in range(self.puzzle_width):
                 for i in range(self.number_of_rows):
-                   if int(current_state[i * self.puzzle_width + j]) != counter:
-                       is_goal = False
-                       h1 += 1
+                    if int(current_state[i * self.puzzle_width + j]) != counter:
+                        is_goal = False
+                        h_goal_2 += 1
 
-                    # Increment our counter
-                       counter += 1
+                        # Increment our counter
+                        counter += 1
 
-                       # If we reached the last element, we want to set it to 0,
-                       # since that is what the last element should be in goal-state-2
-                       if counter == self.puzzle_length:
-                           counter = 0
-            # end: inner-for-loop
-        # end: outer-for-loop
-    # end: if
+                        # If we reached the last element, we want to set it to 0,
+                        # since that is what the last element should be in goal-state-2
+                        if counter == self.puzzle_length:
+                            counter = 0
+                # end: inner-for-loop
+            # end: outer-for-loop
+        # end: if
 
-        return min(h0, h1)
+        # Return the minimum of the two heuristics
+        return min(h_goal_1, h_goal_2)
+    # end: h1
 
-    # Manhattan Distance
     def h2(self, current_state):
-        goal1 = ['1', '2', '3', '4', '5', '6', '7', '0']
-        goal2 = ['1', '3', '5', '7', '2', '4', '6', '0']
-        return min(sum(abs(b % 4 - g % 4) + abs(b // 4 - g // 4) for b, g in
-                       ((current_state.index(str(i)), goal2.index(str(i))) for i in range(8))),
-                   sum(abs(b % 4 - g % 4) + abs(b // 4 - g // 4) for b, g in
-                       ((current_state.index(str(i)), goal1.index(str(i))) for i in range(8)))
-                   )
+        """
+        The second heuristic.
+        This heuristic implements the "Manhattan Distance" calculation.
+        :param current_state: The current state of the puzzle.
+        :return: The heuristic value.
+        """
+        # Setup these lists to be equal to the two goal states
+        goal_1 = ['1', '2', '3', '4', '5', '6', '7', '0']
+        goal_2 = ['1', '3', '5', '7', '2', '4', '6', '0']
+
+        # Find the manhattan distance from the current state to the first goal state
+        h_goal_1 = sum(
+            abs(b % self.puzzle_width - g % self.puzzle_width) + abs(b // self.puzzle_width - g // self.puzzle_width)
+            for b, g in ((current_state.index(str(i)), goal_1.index(str(i))) for i in range(8))
+        )
+
+        # Find the manhattan distance from the current state to the second goal state
+        h_goal_2 = sum(
+            abs(b % self.puzzle_width - g % self.puzzle_width) + abs(b // self.puzzle_width - g // self.puzzle_width)
+            for b, g in ((current_state.index(str(i)), goal_2.index(str(i))) for i in range(8))
+        )
+
+        # Return the minimum between the two heuristic values to each goal
+        return min(h_goal_1, h_goal_2)
+    # end: h2
+# end: class Helper

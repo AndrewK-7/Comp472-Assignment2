@@ -2,6 +2,7 @@ import time
 import numpy as np
 
 from output_writer import OutputWriter
+from algorithms.node import Node
 from algorithms.helper import Helper
 from algorithms.helper import get_state_as_string
 
@@ -34,6 +35,7 @@ class UniformCost:
         # Initialize our open and closed lists for the uniform cost search
         self.open_list = [Node(puzzle, None, 0, None, 0, None)]
         self.closed_list = []
+
     # end: __init__
 
     def solve(self):
@@ -86,18 +88,25 @@ class UniformCost:
         # end: while-loop
 
         # Did we find a goal state?
+        timedout = False
         if found_goal:
             self.write_solution(goal_node, execution_time)
         else:
             # If the solution could not be found due to a timeout
             if execution_time >= self.timeout:
                 self.output_writer.write_line_to_solution("no solution (timed out)")
+                timedout = True
             else:
                 self.output_writer.write_line_to_solution("no solution")
             # end: if-else
         # end: if-else
 
-        print("   Done usc!", flush=True, end="\n")
+        line = "   Done"
+        if timedout:
+            line = "   Timed-out"
+
+        line += " usc! (took " + "{:.4f}".format(execution_time) + " seconds)"
+        print(line, flush=True, end="\n")
     # end: solve
 
     def write_search(self, node):
@@ -114,9 +123,9 @@ class UniformCost:
 
         # Write the line to the file
         self.output_writer.write_line_to_search(
-            repr(f) + " " + repr(g) + " " + repr(h) + " " +
-            get_state_as_string(node.state)
+            repr(f) + " " + repr(g) + " " + repr(h) + " " + get_state_as_string(node.state)
         )
+
     # end: write_search
 
     def write_solution(self, goal_node, execution_time):
@@ -164,14 +173,16 @@ class UniformCost:
 
         # The last line in the file should contain the total cost of the solution as well as the total execution time
         self.output_writer.write_line_to_solution(repr(goal_node.cost) + " " + "{:.4f}".format(execution_time))
+
     # end: write_solution
 
     def sort_open_list(self):
         """
-        Sort the open list by the cost of each of the nodes.
+        Sort the open list by the cost (g(n)) of each of the nodes.
         :return: void
         """
         self.open_list.sort(key=lambda node: node.cost)
+
     # end: sort_open_list
 
     def handle_children(self, current_node, child_states):
@@ -184,8 +195,12 @@ class UniformCost:
         """
         # Check each of the children to see if they must be added to the open list
         for child in child_states:
+            # The cost (g(n)) for this node will be the cost of the current node (the parent, which will be the cost
+            # to get to the parent from the root) plus the cost to get to this child node from the current node
+            child_node_cost = current_node.cost + child[1]
+
             # Create the child node object
-            child_node = Node(child[0], current_node, current_node.cost + child[1], child[2], child[1], child[3])
+            child_node = Node(child[0], current_node, child_node_cost, child[2], child[1], child[3])
 
             # Check if the child state already exists in the closed list
             found_in_closed_list = False
@@ -224,34 +239,3 @@ class UniformCost:
         # end: for-loop
     # end: handle_children
 # end: class UniformCost
-
-
-class Node:
-    """
-    A small class to house the common properties related to a node in our state tree.
-    """
-
-    def __init__(self,
-                 node_state,
-                 parent_node,
-                 total_cost_from_root,
-                 move_to_get_here_from_parent,
-                 move_cost,
-                 moved_tile):
-        """
-        Define the node object.
-        :param node_state: The state that this node contains.
-        :param parent_node: The state of the parent node.
-        :param total_cost_from_root: The total cost to get to this node from the root.
-        :param move_to_get_here_from_parent: The type of move that was taken to reach this node.
-        :param move_cost: The cost of the move.
-        :param moved_tile: The tile that was moved to get to this state.
-        """
-        self.state = node_state
-        self.parent_node = parent_node
-        self.cost = total_cost_from_root
-        self.move = move_to_get_here_from_parent
-        self.move_cost = move_cost
-        self.moved_tile = moved_tile
-    # end: __init__
-# end: class Node
