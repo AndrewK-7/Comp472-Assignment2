@@ -4,6 +4,7 @@ https://github.com/AndrewK-7/Comp472-Assignment2.git
 # How to run the program:
 1. Navigate to the root directory of the project in a terminal that supports Python (eg. PowerShell)
 2. Run the main.py file by executing `python main.py`
+2.1. To change which input file is read for the initial puzzle states, open the main.py file and modify the `input_file` value found in the __main__ code. Note: If a puzzle is meant to have more than 2 rows of data, the `number_of_rows` variable must also be changed accordingly. Furthermore, the 
 3. To view the output files, wait until the application completes, and navigate to the /outputs/ directory.
 
 # Contributions:
