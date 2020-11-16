@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
     # Define where to read in the sample puzzles
     # *** NOTE *** Change this to point to the desired file to execute
-    input_file = "inputs/sample_inputs.txt"
+    input_file = "inputs/fifty_random_puzzles.txt"
 
     # Define how many rows are supposed to be in each of the puzzles
     # *** NOTE *** Change this to the desired number of rows as needed

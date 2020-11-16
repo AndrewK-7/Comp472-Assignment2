@@ -231,8 +231,10 @@ class AStar:
                     # add this child node to the open list
                     else:
                         found_in_closed_list = True
+                    # end: if-else
 
                     break
+                # end: if
             # end: for-loop
 
             # Check if we need to pop the element from the closed list

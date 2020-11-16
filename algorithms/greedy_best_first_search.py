@@ -217,10 +217,8 @@ class GreedyBestFirstSearch:
                 comparison = np.array(node.state) == np.array(child_node.state)
                 if comparison.all():
                     found_in_closed_list = True
-                    if node.heuristic_value > child_node.heuristic_value:
-                        # In this case where child node is smaller, put it in the open list
-                        self.open_list.append(child_node)
                     break
+                # end: if
             # end: for-loop
 
             # If the node is NOT in the closed list and was NOT in the open list, we can add it to our open list

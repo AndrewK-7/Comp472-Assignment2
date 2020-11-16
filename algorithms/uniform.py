@@ -35,7 +35,6 @@ class UniformCost:
         # Initialize our open and closed lists for the uniform cost search
         self.open_list = [Node(puzzle, None, 0, None, 0, None)]
         self.closed_list = []
-
     # end: __init__
 
     def solve(self):
@@ -125,7 +124,6 @@ class UniformCost:
         self.output_writer.write_line_to_search(
             repr(f) + " " + repr(g) + " " + repr(h) + " " + get_state_as_string(node.state)
         )
-
     # end: write_search
 
     def write_solution(self, goal_node, execution_time):
@@ -173,7 +171,6 @@ class UniformCost:
 
         # The last line in the file should contain the total cost of the solution as well as the total execution time
         self.output_writer.write_line_to_solution(repr(goal_node.cost) + " " + "{:.4f}".format(execution_time))
-
     # end: write_solution
 
     def sort_open_list(self):
@@ -182,7 +179,6 @@ class UniformCost:
         :return: void
         """
         self.open_list.sort(key=lambda node: node.cost)
-
     # end: sort_open_list
 
     def handle_children(self, current_node, child_states):

@@ -8,8 +8,6 @@ def get_state_as_string(state):
     for element in state:
         string_state += " " + element
     return string_state.lstrip()
-
-
 # end: get_state_as_string
 
 
@@ -47,7 +45,6 @@ class Helper:
         # These are all of the 'diagonal' moves
         self.cost_of_diagonal_adjacent = diagonal_move_cost
         self.cost_of_diagonal_across = diagonal_move_cost
-
     # end: __init__
 
     def is_goal_state(self, current_state):
@@ -91,7 +88,6 @@ class Helper:
         # end: if
 
         return is_goal
-
     # end: is_goal_state
 
     def can_move_up(self, index):
@@ -104,7 +100,6 @@ class Helper:
         if index in range(0, self.puzzle_width):
             return False
         return True
-
     # end: can_move_up
 
     def can_move_down(self, index):
@@ -117,7 +112,6 @@ class Helper:
         if index in range(self.puzzle_length - self.puzzle_width, self.puzzle_length):
             return False
         return True
-
     # end: can_move_down
 
     def can_move_left(self, index):
@@ -134,7 +128,6 @@ class Helper:
             return False
 
         return True
-
     # end: can_move_left
 
     def can_move_right(self, index):
@@ -151,7 +144,6 @@ class Helper:
             return False
 
         return True
-
     # end: can_move_right
 
     def can_move_wrap(self, index):
@@ -168,7 +160,6 @@ class Helper:
             return False
 
         return True
-
     # end: can_move_wrap
 
     def can_move_diagonally(self, index):
@@ -185,7 +176,6 @@ class Helper:
             return False
 
         return True
-
     # end: can_move_diagonally
 
     def move_up(self, current_state):
@@ -215,7 +205,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_up, tile_that_was_swapped
-
     # end: move_up
 
     def move_down(self, current_state):
@@ -245,7 +234,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_down, tile_that_was_swapped
-
     # end: move_down
 
     def move_left(self, current_state):
@@ -274,7 +262,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_left, tile_that_was_swapped
-
     # end: move_left
 
     def move_right(self, current_state):
@@ -303,7 +290,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_move_right, tile_that_was_swapped
-
     # end: move_right
 
     def wrap(self, current_state):
@@ -349,7 +335,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_wrap_move, tile_that_was_swapped
-
     # end: wrap
 
     def wrap_scale(self, current_state):
@@ -400,7 +385,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_wrap_move, tile_that_was_swapped
-
     # end: wrap_scale
 
     def diagonal_adjacent(self, current_state):
@@ -445,7 +429,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_diagonal_adjacent, tile_that_was_swapped
-
     # end: diagonal_adjacent
 
     def diagonal_across(self, current_state):
@@ -490,7 +473,6 @@ class Helper:
         # end: if-else
 
         return self.cost_of_diagonal_across, tile_that_was_swapped
-
     # end: diagonal_across
 
     def generate_children(self, current_state):
@@ -562,8 +544,41 @@ class Helper:
 
         # Return the list of possible moves
         return list_of_possible_moves
-
     # end: generate_children
+
+    def get_goal_state_1(self):
+        """
+        Get the goal state 1 list of tokens.
+        :return:
+        """
+        goal_state_1 = [str(i) for i in range(1, self.puzzle_length)]
+        goal_state_1.append('0')
+        return goal_state_1
+    # end: get_goal_state_1
+
+    def get_goal_state_2(self):
+        """
+        Get the goal state 2 list of tokens.
+        :return:
+        """
+        # Create a list with the total number of elements for this puzzle
+        goal_state_2 = ['0'] * self.puzzle_length
+
+        counter = 1
+        for j in range(self.puzzle_width):
+            for i in range(self.number_of_rows):
+                goal_state_2[i * self.puzzle_width + j] = str(counter)
+                counter += 1
+
+                # If we reached the last element, we want to set it to 0,
+                # since that is what the last element should be in goal-state-2
+                if counter == self.puzzle_length:
+                    counter = 0
+            # end: inner-for-loop
+        # end: outer-for-loop
+
+        return goal_state_2
+    # end: get_goal_state_2
 
     def h0(self, current_state):
         """
@@ -577,7 +592,6 @@ class Helper:
             return 0
 
         return 1
-
     # end: h0
 
     def h1(self, current_state):
@@ -638,19 +652,19 @@ class Helper:
         :return: The heuristic value.
         """
         # Setup these lists to be equal to the two goal states
-        goal_1 = ['1', '2', '3', '4', '5', '6', '7', '0']
-        goal_2 = ['1', '3', '5', '7', '2', '4', '6', '0']
+        goal_1 = self.get_goal_state_1()
+        goal_2 = self.get_goal_state_2()
 
         # Find the manhattan distance from the current state to the first goal state
         h_goal_1 = sum(
             abs(b % self.puzzle_width - g % self.puzzle_width) + abs(b // self.puzzle_width - g // self.puzzle_width)
-            for b, g in ((current_state.index(str(i)), goal_1.index(str(i))) for i in range(8))
+            for b, g in ((current_state.index(str(i)), goal_1.index(str(i))) for i in range(self.puzzle_length))
         )
 
         # Find the manhattan distance from the current state to the second goal state
         h_goal_2 = sum(
             abs(b % self.puzzle_width - g % self.puzzle_width) + abs(b // self.puzzle_width - g // self.puzzle_width)
-            for b, g in ((current_state.index(str(i)), goal_2.index(str(i))) for i in range(8))
+            for b, g in ((current_state.index(str(i)), goal_2.index(str(i))) for i in range(self.puzzle_length))
         )
 
         # Return the minimum between the two heuristic values to each goal
