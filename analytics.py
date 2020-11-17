@@ -70,6 +70,7 @@ def process_data(algo, data):
     :param data: The data.
     :return:
     """
+    total_solutions_found = 0
     total_ser_length = 0
     total_sol_length = 0
     total_no_solutions = 0
@@ -84,16 +85,18 @@ def process_data(algo, data):
         total_time += d[0][3]
         total_ser_length += d[1][0]
 
-        if d[0][0] == 0:
-            avg_costs += 0.0
-        else:
+        # Count all of the actual solutions,
+        # for each solution found, add it's cost
+        if d[0][1] == 0:
+            total_solutions_found += 1
             avg_costs += d[0][2] / d[0][0]
+        # end: if
     # end: for-loop
 
-    avg_ser_length = total_ser_length / len(data)
-    avg_sol_length = total_sol_length / len(data)
+    avg_ser_length = total_ser_length / total_solutions_found
+    avg_sol_length = total_sol_length / total_solutions_found
     avg_no_solutions = total_no_solutions / len(data)
-    avg_cost = avg_costs / len(data)
+    avg_cost = avg_costs / total_solutions_found
     avg_time = total_time / len(data)
 
     print(algo, " Average solution length: %f, Total solution length: %d" % (avg_sol_length, total_sol_length))

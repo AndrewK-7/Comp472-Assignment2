@@ -66,8 +66,8 @@ if __name__ == '__main__':
     # We will perform 10 different tests on increasing puzzle sizes
     NUMBER_OF_TESTS = 10
 
-    # Se the timeout time to 10 minutes
-    TIMEOUT = 60
+    # Se the timeout time to 1 hour
+    TIMEOUT = 3600
 
     # We will start off the tests on the standard 4x2 board
     width_of_puzzle = 2

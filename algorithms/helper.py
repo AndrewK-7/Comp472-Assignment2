@@ -594,6 +594,23 @@ class Helper:
         return 1
     # end: h0
 
+    def continuous(self, current_state):
+        """
+        The function that check if current state is continuous with one exception
+        ex) 12345607 or 01234567 ->True
+        :return: bool if it's continuous state or not.
+        """
+        h = 0
+        for i in range(1, self.puzzle_length):
+            if int(current_state[i - 1]) == i - h:
+                continue
+            elif int(current_state[i - 1]) == 0:
+                h = 1
+            else:
+                return False
+        return True
+    # end: connected
+
     def h1(self, current_state):
         """
         The first heuristic.
@@ -640,8 +657,11 @@ class Helper:
             # end: outer-for-loop
         # end: if
 
+        if self.continuous(current_state):
+            return min(h_goal_1, h_goal_2)
+        else:
+            return 2 * min(h_goal_1, h_goal_2)
         # Return the minimum of the two heuristics
-        return min(h_goal_1, h_goal_2)
     # end: h1
 
     def h2(self, current_state):
